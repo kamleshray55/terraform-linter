@@ -1,0 +1,2 @@
+# terraform-linter
+tflint
