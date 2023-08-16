@@ -1,0 +1,30 @@
+name: AWS example workflow
+on: workflow_dispatch
+env:
+  AWS_REGION: ap-south-1
+# permission can be added at job level or workflow level
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+jobs:
+  S3PackageUpload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLEARN }}
+          role-session-name: samplerolesession
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Terraform Init
+        run: terraform init --upgrade
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform linter
+        run: |
+          tflint --init
+          tflint
